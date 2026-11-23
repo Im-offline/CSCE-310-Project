@@ -1,0 +1,73 @@
+from player import Player
+from game_logic import Game
+import pandas as pd
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+
+# Change to your CSV region
+REGION = "NA-E"
+
+# Load all players from existing CSV
+df = pd.read_csv(ROOT/"data/" / f"{REGION}.csv")
+df.columns = df.columns.str.strip().str.strip('"\'')
+
+all_players = [Player(**row) for row in df.to_dict(orient="records")]
+
+print(f"Loaded {len(all_players)} players from CSV")
+
+
+# ============================
+# GREEDY TEST
+# ============================
+
+print("\n========== GREEDY TEST ==========")
+
+game1 = Game()
+
+# Use an existing CSV player
+greedy_player = all_players[0]
+greedy_player.matches_played = 5
+
+game1.queue_player(greedy_player)
+
+print("\nGreedy results:")
+game1.print_players()
+
+print("Total players:", len(game1.players))
+
+assert len(game1.players) == 10, (
+    f"Expected 10 players, got {len(game1.players)}"
+)
+
+print("GREEDY TEST PASSED!")
+
+
+# ============================
+# BFS TEST
+# ============================
+
+print("\n========== BFS TEST ==========")
+
+game2 = Game()
+
+# Use another existing CSV player
+bfs_player = all_players[0]
+bfs_player.matches_played = 20
+
+game2.queue_player(bfs_player)
+
+print("\nBFS results:")
+game2.print_players()
+
+print("Total players:", len(game2.players))
+
+# Verify every matched player's MMR
+for player in game2.players[1:]:
+    assert bfs_player.mmr - 100 <= player.mmr <= bfs_player.mmr + 100, (
+        f"{player.name} has an invalid MMR: {player.mmr}"
+    )
+
+assert len(game2.players) <= 10
+
+print("BFS TEST PASSED!")

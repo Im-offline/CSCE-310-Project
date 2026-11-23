@@ -1,4 +1,5 @@
-from classes import Player
+#in order to run this fule from main, change 'from player' to 'from classes'
+from player import Player
 from pathlib import Path
 import pandas as pd
 from collections import deque
@@ -18,7 +19,7 @@ class Game:
             self.matchmake_greedy(player.match_making_region)
         else:
             print('BFS')
-            self.matchmake_DC(player.match_making_region, player.mmr)
+            self.matchmake_BFS(player.match_making_region, player.mmr)
 
 
     def matchmake_greedy(self, match_making_region):
