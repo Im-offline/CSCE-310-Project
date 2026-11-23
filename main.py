@@ -28,6 +28,3 @@ p4.print_stats()
 
 p2.ready_up(game)
 p3.ready_up(game)
-#asdf
-# hello i am here
-#works
