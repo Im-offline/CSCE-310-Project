@@ -6,6 +6,15 @@ class Player:
         self.rank = rank
         self.mmr = mmr
 
+    def __repr__(self):
+        return (
+            f"Player(username={self.username!r}, "
+            f"region={self.match_making_region!r}, "
+            f"matches={self.matches_played}, "
+            f"rank={self.rank}, "
+            f"mmr={self.mmr})"
+        )
+
     def print_stats(self):
         print("username = " + self.username)
         print("matchmaking region = " + self.match_making_region)

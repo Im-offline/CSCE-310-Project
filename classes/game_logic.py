@@ -1,6 +1,8 @@
 from classes import Player
 from pathlib import Path
 import pandas as pd
+from collections import deque
+import random
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -10,32 +12,54 @@ class Game:
 
     def queue_player(self, player: Player):
         self.players.append(player)
+
         if player.matches_played <= 10:
             print('greedy')
             self.matchmake_greedy(player.match_making_region)
         else:
-            print('divide and conquer')
+            print('BFS')
             self.matchmake_DC(player.match_making_region, player.mmr)
 
+
     def matchmake_greedy(self, match_making_region):
-        #grab the first 9 players regardless of mmr (kruskals algo)
+        #grab 9 random players regardless of mmr
         df = pd.read_csv(ROOT/"data/" / f"{match_making_region}.csv")
-        #print(df)
-        self.players.append()
-        #add players from df into a queue, then just add the original player plus 9
-        #others to the player list
+        df.columns = df.columns.str.strip().str.strip('"\'')
+
+        available_players = [Player(**row) for row in df.to_dict(orient = 'records')]
+
+        for _ in range(9):
+            self.players.append(available_players.pop(random.randrange(len(available_players))))
+
+        self.play()
         
 
-    def matchmake_DC(self, match_making_region, mmr):
+        
+    def matchmake_BFS(self, match_making_region, mmr):
         #look through the file to find 9 players who have an mmr of +- 100 (merge or quick sort)
         #mmr of the matchmaking player
         df = pd.read_csv(ROOT/"data/" / f"{match_making_region}.csv")
+        df.columns = df.columns.str.strip().str.strip('"\'')        
+
+        available_players = [Player(**row) for row in df.to_dict(orient = 'records')]
         
-        #add players from df into a queue, then search for 9 players who are within
-        #100 mmr of the matchmaking player and add them all to the players list
+        matchmakingQueue= deque()
+        matchmakingQueue.extend(available_players)
+        playerOne=self.players[0]
         
+        floorMMR=(playerOne.mmr-100)
+        ceilingMMR=(playerOne.mmr+100)
         
-        
-    
+        for p in matchmakingQueue:
+            if (p.mmr>=floorMMR) and (p.mmr<=ceilingMMR):
+                self.players.append(p)
+                if len(self.players)==10:
+                    break
+
+        self.play()
+            
     def play(self):
-        pass   
+        pass  
+
+    def print_players(self):
+        print(self.players)
